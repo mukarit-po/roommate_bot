@@ -68,16 +68,61 @@ This guide will walk you through deploying the Roommate Expense Bot to PythonAny
    pip install aiogram pydantic-settings sqlalchemy aiosqlite asyncpg greenlet
    ```
 
-## Step 4: Set Up PostgreSQL Database
+## Step 4: Set Up Database
 
-PythonAnywhere provides PostgreSQL databases for free.
+### For Free Tier Users: Use SQLite (Recommended)
+
+PythonAnywhere free tier works perfectly with SQLite - no additional setup needed!
+
+1. **Keep the default SQLite configuration**:
+   ```env
+   DATABASE_URL=sqlite+aiosqlite:///./roommate_bot.db
+   ```
+
+2. **That's it!** SQLite will automatically create the database file in your project directory.
+
+### Alternative: PostgreSQL on PythonAnywhere (Paid Feature)
+
+If you upgrade to a paid plan, you can use PostgreSQL:
 
 1. **Create a PostgreSQL database**:
    - Go to the "Databases" tab in your PythonAnywhere dashboard
    - Click "Create database" (PostgreSQL)
-   - Note down the database credentials (host, database name, username, password)
+   - Note down the database credentials
 
 2. **Update your `.env` file**:
+   ```env
+   DATABASE_URL=postgresql+asyncpg://your_db_username:your_db_password@your_db_host/your_db_name
+   ```
+
+### Alternative: Free PostgreSQL from External Providers
+
+If you want PostgreSQL without upgrading, use these free options:
+
+#### Option A: Neon (Recommended)
+1. Go to [neon.tech](https://neon.tech) and create a free account
+2. Create a new project
+3. Copy the connection string
+4. Update your `.env`:
+   ```env
+   DATABASE_URL=postgresql+asyncpg://[your-connection-string-from-neon]
+   ```
+
+#### Option B: Supabase
+1. Go to [supabase.com](https://supabase.com) and create a free account
+2. Create a new project
+3. Go to Settings → Database → Connection string
+4. Use the connection string in your `.env`
+
+#### Option C: ElephantSQL
+1. Go to [elephantsql.com](https://elephantsql.com) and create a free account
+2. Create a new instance (Tiny Turtle plan is free)
+3. Copy the database URL
+4. Update your `.env` with the provided URL
+
+## Step 5: Configure the Bot
+
+1. **Create your `.env` file**:
    ```bash
    nano .env
    ```
@@ -86,24 +131,18 @@ PythonAnywhere provides PostgreSQL databases for free.
    ```env
    BOT_TOKEN=your_telegram_bot_token_here
    ADMIN_CHAT_ID=your_telegram_user_id_here
-   DATABASE_URL=postgresql+asyncpg://your_db_username:your_db_password@your_db_host/your_db_name
+   DATABASE_URL=sqlite+aiosqlite:///./roommate_bot.db
    LOG_LEVEL=INFO
    ```
 
-   Replace the placeholders with your actual values.
+   **For free tier users**: Keep `DATABASE_URL=sqlite+aiosqlite:///./roommate_bot.db` (default)
 
-## Step 5: Configure the Bot
+   **For PostgreSQL users**: Replace with your PostgreSQL connection string
 
-1. **Make sure your `.env` file is properly configured** with:
-   - Your bot token from BotFather
-   - Your Telegram user ID
-   - The PostgreSQL database URL from step 4
-
-2. **Test the bot locally first** (optional but recommended):
-   ```bash
-   python bot.py
-   ```
-   Make sure it starts without errors.
+2. **Get your credentials**:
+   - **BOT_TOKEN**: From [@BotFather](https://t.me/botfather) on Telegram
+   - **ADMIN_CHAT_ID**: Your Telegram user ID from [@userinfobot](https://t.me/userinfobot)
+   - **DATABASE_URL**: Use SQLite for free tier, or PostgreSQL URL from step 4
 
 ## Step 6: Run the Bot
 
@@ -117,11 +156,29 @@ PythonAnywhere provides PostgreSQL databases for free.
    python bot.py
    ```
 
-### Method 2: Set Up Always-On Task (For production)
+### Method 2: Keep Console Open (Free Tier)
 
-PythonAnywhere free tier doesn't support always-on tasks, but paid tiers do. For free tier, you'll need to keep the console open.
+For PythonAnywhere free tier users:
 
-For paid tiers:
+1. **Start the bot in a console**:
+   ```bash
+   source ~/roommate_bot_env/bin/activate
+   cd roommate_bot
+   python bot.py
+   ```
+
+2. **Keep the console active**:
+   - Don't close the browser tab
+   - PythonAnywhere consoles stay active while the tab is open
+   - If you need to leave, the console will timeout after ~1 hour
+
+3. **Restart when needed**:
+   - If the console times out, start a new console and run the bot again
+   - Your SQLite database will persist between restarts
+
+### Method 3: Always-On Task (Paid Tiers Only)
+
+For paid PythonAnywhere tiers:
 1. Go to "Tasks" tab
 2. Create a new "Always-on task"
 3. Set the command:
@@ -175,8 +232,9 @@ For paid tiers:
 
 1. **Free tier limitations**:
    - Console sessions timeout after ~1 hour of inactivity
-   - No always-on tasks
-   - Limited CPU time
+   - No always-on tasks (bot will stop when console closes)
+   - Limited CPU time per day
+   - SQLite database files are stored locally
 
 2. **File paths**:
    - Use absolute paths: `/home/your_username/roommate_bot/`
@@ -185,6 +243,11 @@ For paid tiers:
 3. **Environment variables**:
    - Make sure `.env` file is in the project root
    - PythonAnywhere might need `export` commands for some variables
+
+4. **SQLite on PythonAnywhere**:
+   - Database file will be created in your project directory
+   - File path: `/home/your_username/roommate_bot/roommate_bot.db`
+   - SQLite works perfectly for free tier users
 
 ## Maintenance
 
