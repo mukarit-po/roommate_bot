@@ -1,0 +1,4 @@
+aiogram>=3.0.0
+pydantic-settings
+sqlalchemy>=2.0.0
+aiosqlite
