@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import Expense, Group, User
+from models import Expense, Group, Settlement, User
 from repositories import ExpenseRepository, GroupRepository, SettlementRepository, UserRepository
 from services.balance_service import DebtEntry, compute_balances, optimize_debts
 
